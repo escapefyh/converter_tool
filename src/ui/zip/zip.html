@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>压缩与解压工具</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            text-align: center;
+            padding: 40px;
+            background-color: #f0f2f5;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        .box {
+            border: 2px dashed #9c27b0;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            margin: 0 auto;
+            max-width: 720px;
+        }
+        .mode-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .file-input-wrapper { margin-bottom: 20px; }
+        .file-input-wrapper input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 450px;
+        }
+        .format-info {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+            text-align: left;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .path-section {
+            margin-bottom: 20px;
+            background: #eee;
+            padding: 12px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .small-btn {
+            padding: 5px 15px;
+            margin-left: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .small-btn:hover { background: #0056b3; }
+        #convertBtn {
+            padding: 10px 30px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            background: #9c27b0;
+        }
+        #convertBtn:hover { background: #7b1fa2; }
+        #status {
+            color: gray;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+        label { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>📦 压缩 / 解压 工具</h1>
+
+    <div class="box">
+        <div class="mode-row">
+            <label>
+                <input type="radio" name="mode" value="compress" checked>
+                压缩（文件 → ZIP）
+            </label>
+            <label>
+                <input type="radio" name="mode" value="extract">
+                解压（ZIP → 文件夹）
+            </label>
+        </div>
+
+        <div class="file-input-wrapper">
+            <input
+                type="file"
+                id="fileInput"
+                multiple
+            >
+            <div class="format-info">
+                💡 压缩模式：可一次选择多个文件；也可以点“添加文件夹”把整个文件夹一起打包<br>
+                💡 解压模式：请选择一个 .zip 文件，解压到目标目录
+            </div>
+            <div style="margin-top:8px; text-align:left; font-size:12px; color:#555;">
+                <button id="addFolderBtn" class="small-btn" type="button">➕ 添加文件夹</button>
+                <span id="folderListText" style="margin-left:8px;">（尚未选择文件夹）</span>
+            </div>
+        </div>
+
+        <div class="path-section">
+            <span id="pathDisplay">📂 默认位置：保存在原文件目录</span>
+            <button id="selectDirBtn" class="small-btn">更改保存位置</button>
+        </div>
+
+        <button id="convertBtn">🚀 开始执行</button>
+    </div>
+
+    <p id="status">等待操作...</p>
+
+    <script src="zip.js"></script>
+</body>
+</html>
+
+

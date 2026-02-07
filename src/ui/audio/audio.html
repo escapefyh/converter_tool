@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>音频工具</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            text-align: center;
+            padding: 40px;
+            background-color: #f0f2f5;
+        }
+        h1 { color: #333; margin-bottom: 20px; }
+        .box {
+            border: 2px dashed #ff9800;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            margin: 0 auto;
+            max-width: 700px;
+        }
+        .file-input-wrapper { margin-bottom: 20px; }
+        .drop-zone {
+            border: 2px dashed #ff9800;
+            padding: 45px 20px;
+            border-radius: 8px;
+            background: #fafafa;
+            position: relative;
+        }
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .drop-zone-text {
+            pointer-events: none;
+            text-align: left;
+            color: #555;
+        }
+        .drop-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .drop-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .drop-subtext {
+            font-size: 12px;
+            color: #888;
+        }
+        .path-section {
+            margin-bottom: 20px;
+            background: #eee;
+            padding: 12px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .small-btn {
+            padding: 5px 15px;
+            margin-left: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .small-btn:hover { background: #0056b3; }
+        #convertBtn {
+            padding: 10px 26px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            background: #ff9800;
+        }
+        #convertBtn:hover { background: #fb8c00; }
+        #status {
+            color: gray;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎧 音频转换工具</h1>
+
+        <div class="box">
+        <div class="file-input-wrapper">
+            <div class="drop-zone">
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept=".wav,.m4a,.flac,.ogg,.wma,.aac,.aiff,.mp4,.mov,.mkv"
+                >
+                <div id="fileLabel" class="drop-zone-text">
+                    <div class="drop-icon">🎧</div>
+                    <div class="drop-title">点击或拖拽音频 / 视频到这里</div>
+                    <div class="drop-subtext">
+                        支持：音频 WAV, M4A, FLAC, OGG, WMA, AAC, AIFF；视频 MP4, MOV, MKV（提取音轨为 MP3）
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="path-section">
+            <span id="pathDisplay">📂 默认位置：保存在原文件目录</span>
+            <button id="selectDirBtn" class="small-btn">更改保存位置</button>
+        </div>
+
+        <button id="convertBtn">🚀 转为 MP3</button>
+    </div>
+
+    <p id="status">等待操作...</p>
+
+    <script src="audio.js"></script>
+</body>
+</html>
+
+

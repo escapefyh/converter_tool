@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>万能格式转换器 v1.0</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f0f2f5; }
+        h1 { color: #333; }
+        .box { padding: 30px; background: white; border-radius: 10px; margin-top: 20px;}
+        .drop-zone {
+            border: 2px dashed #007bff;
+            padding: 45px 25px;
+            border-radius: 10px;
+            background: #fafafa;
+            position: relative;
+        }
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .drop-zone-text {
+            pointer-events: none;
+            color: #555;
+        }
+        .drop-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .drop-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .drop-subtext {
+            font-size: 12px;
+            color: #888;
+        }
+        .drop-zone-text strong {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>🖼️ 图片格式转换器</h1>
+    
+    <div class="box">
+        <div style="margin-bottom: 20px;">
+            <div class="drop-zone">
+                <input 
+                    type="file" 
+                    id="fileInput" 
+                    accept=".png, .jpg, .jpeg, .webp, .gif, .tiff, .avif, .svg"
+                >
+                <div id="fileLabel" class="drop-zone-text">
+                    <div class="drop-icon">📂</div>
+                    <div class="drop-title">点击或拖拽图片到这里</div>
+                    <div class="drop-subtext">
+                        支持格式：<strong>PNG, JPG, WebP, GIF, TIFF, AVIF, SVG</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px; background: #eee; padding: 10px; border-radius: 5px;">
+            <span id="pathDisplay">📂 默认位置：保存在原文件目录</span>
+            <button id="selectDirBtn" class="small-btn">更改保存位置</button>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 10px; align-items: center;">
+            <span style="font-size: 14px;">转为：</span>
+            <select id="formatSelect" style="padding: 5px;">
+                <option value="png">PNG (透明背景)</option>
+                <option value="jpg">JPG (通用格式)</option>
+                <option value="webp">WebP (体积小)</option>
+                <option value="gif">GIF (动图)</option>
+                <option value="tiff">TIFF (打印级高清)</option>
+                <option value="avif">AVIF (次世代极小)</option>
+            </select>
+            <button id="convertBtn">🚀 开始转换</button>
+        </div>
+    </div>
+
+    <p id="status" style="color: gray; margin-top: 20px;">等待操作...</p>
+
+    <!-- 修正：加载 image.js，而不是不存在的 renderer.js -->
+    <script src="image.js"></script>
+</body>
+</html>

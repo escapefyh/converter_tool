@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>文件瘦身工具</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            text-align: center;
+            padding: 40px;
+            background-color: #f0f2f5;
+        }
+        h1 { color: #333; margin-bottom: 10px; }
+        .subtitle { color: #666; font-size: 13px; margin-bottom: 20px; }
+        .box {
+            border: 2px dashed #667eea;
+            padding: 30px;
+            background: #fff;
+            border-radius: 10px;
+            margin: 0 auto;
+            max-width: 720px;
+        }
+        .file-input-wrapper { margin-bottom: 20px; }
+        .drop-zone {
+            border: 2px dashed #667eea;
+            padding: 45px 20px;
+            border-radius: 8px;
+            background: #fafafa;
+            position: relative;
+        }
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .drop-zone-text {
+            pointer-events: none;
+            text-align: left;
+            color: #555;
+        }
+        .drop-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .drop-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .drop-subtext {
+            font-size: 12px;
+            color: #888;
+        }
+        .mode-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        .mode-row label { cursor: pointer; }
+        .path-section {
+            margin-bottom: 20px;
+            background: #eee;
+            padding: 12px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .small-btn {
+            padding: 5px 15px;
+            margin-left: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .small-btn:hover { background: #0056b3; }
+        #convertBtn {
+            padding: 10px 30px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            background: #667eea;
+        }
+        #convertBtn:hover { background: #556cd6; }
+        #status {
+            color: gray;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📉 文件瘦身工具</h1>
+    <p class="subtitle">支持图片、视频、音频、PDF，统一输出：JPG / MP4 / MP3 / PDF</p>
+
+        <div class="box">
+        <div class="file-input-wrapper">
+            <div class="drop-zone">
+                <input
+                    type="file"
+                    id="fileInput"
+                >
+                <div id="fileLabel" class="drop-zone-text">
+                    <div class="drop-icon">📉</div>
+                    <div class="drop-title">点击或拖拽文件到这里进行瘦身</div>
+                    <div class="drop-subtext">
+                        支持：图片 / 视频 / 音频 / PDF；输出：JPG / MP4 / MP3 / 压缩 PDF
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mode-row">
+            <label>
+                <input type="radio" name="mode" value="light" checked>
+                轻度压缩（Quality ≈ 90，约原图 80%）
+            </label>
+            <label>
+                <input type="radio" name="mode" value="balanced">
+                均衡模式（Quality ≈ 75，约 30%–50%）
+            </label>
+            <label>
+                <input type="radio" name="mode" value="extreme">
+                极限压缩（Quality ≈ 50，约 10%–20%）
+            </label>
+        </div>
+
+        <div class="path-section">
+            <span id="pathDisplay">📂 默认位置：保存在原文件目录</span>
+            <button id="selectDirBtn" class="small-btn">更改保存位置</button>
+        </div>
+
+        <button id="convertBtn">🚀 开始瘦身</button>
+    </div>
+
+    <p id="status">等待操作...</p>
+
+    <script src="slim.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PDF 转换工具</title>
+    <style>
+        body { 
+            font-family: "Microsoft YaHei", sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+            background-color: #f0f2f5; 
+        }
+        h1 { color: #333; margin-bottom: 30px; }
+        .box { 
+            border: 2px dashed #007bff; 
+            padding: 40px; 
+            background: white; 
+            border-radius: 10px; 
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .file-input-wrapper {
+            margin-bottom: 20px;
+        }
+        .drop-zone {
+            border: 2px dashed #007bff;
+            padding: 45px 20px;
+            border-radius: 8px;
+            background: #fafafa;
+            position: relative;
+        }
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .drop-zone-text {
+            pointer-events: none;
+            text-align: left;
+            color: #555;
+        }
+        .drop-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .drop-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .drop-subtext {
+            font-size: 12px; 
+            color: #888; 
+        }
+        .path-section {
+            margin-bottom: 20px; 
+            background: #eee; 
+            padding: 15px; 
+            border-radius: 5px;
+        }
+        .small-btn {
+            padding: 5px 15px;
+            margin-left: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .small-btn:hover {
+            background: #0056b3;
+        }
+        #convertBtn {
+            padding: 10px 30px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        #convertBtn:hover {
+            background: #218838;
+        }
+        #status {
+            color: gray; 
+            margin-top: 20px;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📄 PDF 转换工具</h1>
+    
+    <div class="box">
+        <div class="file-input-wrapper">
+            <div class="drop-zone">
+                <input 
+                    type="file" 
+                    id="fileInput" 
+                    accept=".jpg,.jpeg,.png,.gif,.tiff,.tif,.html,.htm,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                >
+                <div id="fileLabel" class="drop-zone-text">
+                    <div class="drop-icon">📂</div>
+                    <div class="drop-title">点击或拖拽文件到这里</div>
+                    <div class="drop-subtext">
+                        支持：图片 JPG, PNG, GIF, TIFF；文档 HTML, TXT；Office：Word / Excel / PPT
+                    </div>
+                </div> 
+            </div>
+        </div>
+
+        <div class="path-section">
+            <span id="pathDisplay">📂 默认位置：保存在原文件目录</span>
+            <button id="selectDirBtn" class="small-btn">更改保存位置</button>
+        </div>
+        
+        <button id="convertBtn">🚀 转换为 PDF</button>
+    </div>
+
+    <p id="status">等待操作...</p>
+
+    <script src="pdf.js"></script>
+</body>
+</html>
+
+
