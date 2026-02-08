@@ -6,7 +6,6 @@ const fs = require('fs');
 
 /**
  * 获取 Real-ESRGAN 可执行文件的路径
- * 关键点：开发环境和打包后的环境路径不一样，这里自动判断
  */
 function getBinaryPath() {
   if (app.isPackaged) {
@@ -18,7 +17,8 @@ function getBinaryPath() {
   }
 }
 
-async function upscaleImage(filePath, outputDir) {
+// ✅ 修改函数签名，增加 modelType 参数
+async function upscaleImage(filePath, outputDir, modelType) {
   return new Promise((resolve, reject) => {
     try {
       const exePath = getBinaryPath();
@@ -28,18 +28,27 @@ async function upscaleImage(filePath, outputDir) {
         return reject(`找不到画质增强工具，路径错误: ${exePath}`);
       }
 
-      // 2. 准备输出路径 (默认在文件名后加 _hd)
+      // 2. 准备输出路径
       const dir = outputDir ? outputDir : path.dirname(filePath);
       const ext = path.extname(filePath);
       const name = path.basename(filePath, ext);
-      const outputPath = path.join(dir, `${name}_hd.png`); // AI 增强通常输出 png 质量最好
+      
+      // ✅ 策略核心：根据 modelType 选择模型名称
+      // 'photo' -> 'realesrgan-x4plus'
+      // 'anime' -> 'realesrgan-x4plus-anime'
+      const modelName = (modelType === 'anime') 
+          ? 'realesrgan-x4plus-anime' 
+          : 'realesrgan-x4plus';
+
+      // 输出文件名也可以带上模型标识，方便区分
+      const outputPath = path.join(dir, `${name}_${modelName}_hd.png`); 
 
       // 3. 准备命令参数
-      // -i 输入, -o 输出, -n 模型名(realesrgan-x4plus), -s 放大倍数(4)
+      // -n 参数现在是动态变量 modelName
       const args = [
         '-i', filePath,
         '-o', outputPath,
-        '-n', 'realesrgan-x4plus', 
+        '-n', modelName, 
         '-s', '4'
       ];
 

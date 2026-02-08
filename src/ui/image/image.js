@@ -1,120 +1,129 @@
-// 1. 获取 HTML 页面上的元素
-const fileInput = document.getElementById('fileInput');
-const fileLabel = document.getElementById('fileLabel');
-const formatSelect = document.getElementById('formatSelect');
-const convertBtn = document.getElementById('convertBtn');
-const statusOutput = document.getElementById('status');
-const selectDirBtn = document.getElementById('selectDirBtn');
-const pathDisplay = document.getElementById('pathDisplay');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const upscaleHandler = require('./src/services/upscaleService'); // ✅
+const path = require('path')
 
-// ✅ 新增：获取 AI 增强按钮
-const upscaleBtn = document.getElementById('upscaleBtn');
+// ==========================================================
+// ✅✅✅ 【核心修复】FFmpeg 路径修正逻辑
+// ==========================================================
+let ffmpegPath = require('ffmpeg-static');
+const ffmpeg = require('fluent-ffmpeg');
 
-const defaultFileLabelText = fileLabel ? fileLabel.innerText : '';
+if (app.isPackaged) {
+  ffmpegPath = ffmpegPath.replace('app.asar', 'app.asar.unpacked');
+}
+ffmpeg.setFfmpegPath(ffmpegPath);
 
-// 统一从父窗口拿到 api
-const api = (window.parent && window.parent.api) ? window.parent.api : window.api;
-
-console.log('image.js 已加载');
-
-// 监听文件选择
-if (fileInput && fileLabel) {
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0) {
-            const name = fileInput.files[0].name;
-            fileLabel.innerText = `📄 文件名：${name}`;
-        } else {
-            fileLabel.innerText = defaultFileLabelText;
-        }
-    });
+try {
+    let ffprobePath = require('ffprobe-static').path;
+    if (app.isPackaged) {
+        ffprobePath = ffprobePath.replace('app.asar', 'app.asar.unpacked');
+    }
+    ffmpeg.setFfprobePath(ffprobePath);
+} catch (e) {
+    console.log('未检测到 ffprobe-static，跳过配置');
 }
 
-// 存储输出路径
-let selectedOutputPath = null;
+console.log('✅ FFmpeg 路径已修正为:', ffmpegPath);
+// ==========================================================
 
-// 点击“更改保存位置”
-selectDirBtn.addEventListener('click', async () => {
-    const path = await api.selectFolder();
-    if (path) {
-        selectedOutputPath = path;
-        pathDisplay.innerText = `📂 保存到：${path}`;
-        pathDisplay.style.color = '#0056b3';
+
+// ✅ 引入业务处理模块
+const imageHandler = require('./src/services/imageService')
+const pdfHandler = require('./src/services/pdfService')
+const videoHandler = require('./src/services/videoService')
+const audioHandler = require('./src/services/audioService')
+const zipHandler = require('./src/services/zipService')
+const slimHandler = require('./src/services/slimService')
+
+function createWindow () {
+  const win = new BrowserWindow({
+    width: 900,
+    height: 700,
+    icon: path.join(__dirname, 'assets', 'icon.ico'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
     }
-});
+  })
 
-// ==========================================
-// 逻辑 B：普通转换
-// ==========================================
-convertBtn.addEventListener('click', async () => {
-    if (fileInput.files.length === 0) {
-        alert('请先选择一张图片！');
-        return;
-    }
-    const file = fileInput.files[0];
-    const targetFormat = formatSelect.value;
-    const filePath = api.getFilePath(file);
-
-    statusOutput.innerText = '正在转换中...⏳';
-    statusOutput.style.color = 'black';
-
-    try {
-        const result = await api.convertImage(filePath, targetFormat, selectedOutputPath);
-        if (result.success) {
-            statusOutput.innerText = `✅ 转换成功！\n保存路径：${result.newPath}`;
-            statusOutput.style.color = 'green';
-        } else {
-            statusOutput.innerText = `❌ 失败：${result.error}`;
-            statusOutput.style.color = 'red';
-        }
-    } catch (err) {
-        statusOutput.innerText = `❌ 程序错误：${err.message}`;
-        statusOutput.style.color = 'red';
-    }
-});
-
-// ==========================================
-// ✅ 逻辑 C：AI 画质增强 (新增)
-// ==========================================
-if (upscaleBtn) {
-    upscaleBtn.addEventListener('click', async () => {
-        // 1. 检查文件
-        if (fileInput.files.length === 0) {
-            alert('请先选择一张需要修复的图片！');
-            return;
-        }
-
-        const file = fileInput.files[0];
-        const filePath = api.getFilePath(file);
-
-        // 2. 友好的提示 (AI 比较慢)
-        statusOutput.innerHTML = '🚀 正在启动 AI 引擎进行 4倍超分...<br>这可能需要 10-30 秒，请耐心等待，不要关闭窗口。';
-        statusOutput.style.color = '#6f42c1'; // 紫色提示
-
-        // 禁用按钮防止重复点击
-        upscaleBtn.disabled = true;
-        upscaleBtn.innerText = 'AI 处理中...';
-
-        try {
-            console.log('开始 AI 增强:', filePath);
-            
-            // 3. 呼叫后端 api.upscaleImage (需要在 preload.js 定义过)
-            const result = await api.upscaleImage(filePath, selectedOutputPath);
-
-            if (result.success) {
-                statusOutput.innerHTML = `✅ <b>画质增强成功！</b><br>已保存为：${result.newPath}`;
-                statusOutput.style.color = 'green';
-            } else {
-                statusOutput.innerText = `❌ 增强失败：${result.error}`;
-                statusOutput.style.color = 'red';
-            }
-        } catch (err) {
-            console.error(err);
-            statusOutput.innerText = `❌ 调用错误：${err.message}\n请检查是否已下载 tools 并放入项目根目录。`;
-            statusOutput.style.color = 'red';
-        } finally {
-            // 恢复按钮状态
-            upscaleBtn.disabled = false;
-            upscaleBtn.innerText = '⚡ AI 画质增强 (变清晰 4倍)';
-        }
-    });
+  win.loadFile('src/index.html')
 }
+
+app.whenReady().then(() => {
+  createWindow()
+
+  // ✅ 监听“选择文件夹”
+  ipcMain.handle('select-folder', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory']
+    });
+    if (!result.canceled) {
+      return result.filePaths[0];
+    }
+    return null;
+  });
+
+  // ✅ 监听图片转换请求
+  ipcMain.handle('convert-image', async (event, filePath, targetFormat, outputDir) => {
+    const result = await imageHandler.convertImage(filePath, targetFormat, outputDir);
+    return result;
+  });
+
+  // ✅ 监听 PDF 转换请求
+  ipcMain.handle('convert-to-pdf', async (event, filePath, outputDir) => {
+    const result = await pdfHandler.convertToPdf(filePath, outputDir);
+    return result;
+  });
+
+  // ✅ 监听视频转换
+  ipcMain.handle('convert-video', async (event, filePath, outputDir) => {
+    const result = await videoHandler.convertToMp4(filePath, outputDir);
+    return result;
+  });
+
+  ipcMain.handle('convert-video-muted', async (event, filePath, outputDir) => {
+    const result = await videoHandler.convertToMutedMp4(filePath, outputDir);
+    return result;
+  });
+
+  // ✅ 监听音频转换
+  ipcMain.handle('convert-audio', async (event, filePath, outputDir) => {
+    const result = await audioHandler.convertToMp3(filePath, outputDir);
+    return result;
+  });
+
+  // ✅ 监听文件压缩/解压
+  ipcMain.handle('zip-compress', async (event, filePaths, outputDir) => {
+    const result = await zipHandler.compressFiles(filePaths, outputDir);
+    return result;
+  });
+
+  ipcMain.handle('zip-extract', async (event, zipPath, outputDir) => {
+    const result = await zipHandler.extractZip(zipPath, outputDir);
+    return result;
+  });
+
+  // ✅ 监听文件瘦身
+  ipcMain.handle('slim-file', async (event, filePath, mode, outputDir) => {
+    const result = await slimHandler.slimFile(filePath, mode, outputDir);
+    return result;
+  });
+
+  // ==========================================
+  // ✅ 修改：监听 AI 画质增强请求 (接收 modelType)
+  // ==========================================
+  ipcMain.handle('upscale-image', async (event, filePath, outputDir, modelType) => {
+    // 将 modelType 透传给 Service
+    const result = await upscaleHandler.upscaleImage(filePath, outputDir, modelType);
+    return result;
+  });
+  
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit()
+})
