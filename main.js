@@ -1,4 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+// ... 其他引入 ...
+const upscaleHandler = require('./src/services/upscaleService'); // ✅ 新增这一行
 const path = require('path')
 
 // ==========================================================
@@ -122,6 +124,12 @@ app.whenReady().then(() => {
   // ✅ 监听文件瘦身（图片/视频/音频/PDF）
   ipcMain.handle('slim-file', async (event, filePath, mode, outputDir) => {
     const result = await slimHandler.slimFile(filePath, mode, outputDir);
+    return result;
+  });
+
+  // ✅ 新增：监听 AI 画质增强请求
+  ipcMain.handle('upscale-image', async (event, filePath, outputDir) => {
+    const result = await upscaleHandler.upscaleImage(filePath, outputDir);
     return result;
   });
   

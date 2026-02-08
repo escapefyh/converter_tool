@@ -21,6 +21,15 @@
     "directories": {
       "output": "dist"
     },
+
+    "extraResources": [
+      {
+        "from": "./tools",
+        "to": "tools"
+      }
+    ],
+
+
     "win": {
       "icon": "assets/icon.ico",
       "target": [

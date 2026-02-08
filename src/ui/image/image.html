@@ -6,40 +6,51 @@
     <style>
         body { font-family: sans-serif; text-align: center; padding: 50px; background-color: #f0f2f5; }
         h1 { color: #333; }
-        .box { padding: 30px; background: white; border-radius: 10px; margin-top: 20px;}
+        .box { padding: 30px; background: white; border-radius: 10px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .drop-zone {
             border: 2px dashed #007bff;
             padding: 45px 25px;
             border-radius: 10px;
             background: #fafafa;
             position: relative;
+            transition: border-color 0.3s;
         }
+        .drop-zone:hover { border-color: #0056b3; background: #f0f8ff; }
         .drop-zone input[type="file"] {
             position: absolute;
             inset: 0;
             opacity: 0;
             cursor: pointer;
         }
-        .drop-zone-text {
-            pointer-events: none;
-            color: #555;
+        .drop-zone-text { pointer-events: none; color: #555; }
+        .drop-icon { font-size: 60px; margin-bottom: 10px; }
+        .drop-title { font-size: 16px; font-weight: bold; margin-bottom: 6px; }
+        .drop-subtext { font-size: 12px; color: #888; }
+        
+        /* 按钮通用样式 */
+        button {
+            padding: 8px 15px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.2s;
         }
-        .drop-icon {
-            font-size: 60px;
-            margin-bottom: 10px;
-        }
-        .drop-title {
-            font-size: 16px;
+        button:hover { opacity: 0.9; }
+        
+        /* 蓝色按钮 (普通转换) */
+        #convertBtn { background-color: #007bff; color: white; }
+        
+        /* ✅ 紫色按钮 (AI 增强) */
+        #upscaleBtn { 
+            background: linear-gradient(45deg, #6f42c1, #8e44ad); 
+            color: white; 
             font-weight: bold;
-            margin-bottom: 6px;
+            box-shadow: 0 2px 4px rgba(111, 66, 193, 0.3);
         }
-        .drop-subtext {
-            font-size: 12px;
-            color: #888;
-        }
-        .drop-zone-text strong {
-            color: #555;
-        }
+
+        .small-btn { background-color: #6c757d; color: white; font-size: 12px; padding: 5px 10px; }
+        select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
@@ -70,7 +81,7 @@
         
         <div style="display: flex; justify-content: center; gap: 10px; align-items: center;">
             <span style="font-size: 14px;">转为：</span>
-            <select id="formatSelect" style="padding: 5px;">
+            <select id="formatSelect">
                 <option value="png">PNG (透明背景)</option>
                 <option value="jpg">JPG (通用格式)</option>
                 <option value="webp">WebP (体积小)</option>
@@ -80,11 +91,18 @@
             </select>
             <button id="convertBtn">🚀 开始转换</button>
         </div>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ccc;">
+        
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px;">
+            <span style="font-size: 14px; color: #666;">✨ 黑科技功能：</span>
+            <button id="upscaleBtn">⚡ AI 画质增强 (变清晰 4倍)</button>
+        </div>
+
     </div>
 
-    <p id="status" style="color: gray; margin-top: 20px;">等待操作...</p>
+    <p id="status" style="color: gray; margin-top: 20px; line-height: 1.5;">等待操作...</p>
 
-    <!-- 修正：加载 image.js，而不是不存在的 renderer.js -->
     <script src="image.js"></script>
 </body>
 </html>

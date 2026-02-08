@@ -37,5 +37,9 @@ contextBridge.exposeInMainWorld('api', {
 
   // 10. 文件瘦身（图片/视频/音频/PDF）
   slimFile: (filePath, mode, outputDir) =>
-    ipcRenderer.invoke('slim-file', filePath, mode, outputDir)
+    ipcRenderer.invoke('slim-file', filePath, mode, outputDir),
+
+  // ✅ 新增：AI 画质增强接口
+  upscaleImage: (filePath, outputDir) =>
+    ipcRenderer.invoke('upscale-image', filePath, outputDir)
 })

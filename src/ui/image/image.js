@@ -3,18 +3,21 @@ const fileInput = document.getElementById('fileInput');
 const fileLabel = document.getElementById('fileLabel');
 const formatSelect = document.getElementById('formatSelect');
 const convertBtn = document.getElementById('convertBtn');
-const statusOutput = document.getElementById('status'); // 显示结果的文字标签
-const selectDirBtn = document.getElementById('selectDirBtn'); // 选择路径按钮
-const pathDisplay = document.getElementById('pathDisplay');   // 显示路径的文字
+const statusOutput = document.getElementById('status');
+const selectDirBtn = document.getElementById('selectDirBtn');
+const pathDisplay = document.getElementById('pathDisplay');
+
+// ✅ 新增：获取 AI 增强按钮
+const upscaleBtn = document.getElementById('upscaleBtn');
 
 const defaultFileLabelText = fileLabel ? fileLabel.innerText : '';
 
-// 统一从父窗口拿到 api（主窗口 preload 暴露在 window.api 上）
-// 在 iframe 里面直接用 window.api 可能是 undefined，这里做兼容
+// 统一从父窗口拿到 api
 const api = (window.parent && window.parent.api) ? window.parent.api : window.api;
 
 console.log('image.js 已加载');
-// 监听文件选择，更新展示文字
+
+// 监听文件选择
 if (fileInput && fileLabel) {
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
@@ -26,74 +29,92 @@ if (fileInput && fileLabel) {
     });
 }
 
-// 定义一个变量，用来存用户选的路径 (默认是 null，代表存原处)
+// 存储输出路径
 let selectedOutputPath = null;
 
-// ==========================================
-// 逻辑 A：点击“更改保存位置”按钮
-// ==========================================
+// 点击“更改保存位置”
 selectDirBtn.addEventListener('click', async () => {
-    // 呼叫后端打开文件夹窗口
     const path = await api.selectFolder();
-    
-    // 如果用户真的选了个路径（没点取消）
     if (path) {
-        selectedOutputPath = path; // 记下来！
-        // 更新界面上的文字，让用户看到
+        selectedOutputPath = path;
         pathDisplay.innerText = `📂 保存到：${path}`;
-        pathDisplay.style.color = '#0056b3'; // 变个颜色提示一下
+        pathDisplay.style.color = '#0056b3';
     }
 });
 
 // ==========================================
-// 逻辑 B：点击“开始转换”按钮
+// 逻辑 B：普通转换
 // ==========================================
 convertBtn.addEventListener('click', async () => {
-    // 1. 【第一道保险】检查有没有选文件
     if (fileInput.files.length === 0) {
         alert('请先选择一张图片！');
         return;
     }
-
     const file = fileInput.files[0];
-    
-    // 2. 【第二道保险】检查文件后缀名（防止用户选错文件）
-    const allowedExtensions = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'tiff', 'avif', 'svg'];
-    // 获取文件后缀（去掉点，转成小写），例如 "image.PNG" -> "png"
-    const fileExt = file.name.split('.').pop().toLowerCase();
-
-    if (!allowedExtensions.includes(fileExt)) {
-        alert(`不支持的文件格式：.${fileExt}\n请选择图片文件！`);
-        return; // 直接打断，不让错误的格式传给后端
-    }
-
-    // 3. 准备数据
     const targetFormat = formatSelect.value;
-    const filePath = api.getFilePath(file); // 获取真实路径
+    const filePath = api.getFilePath(file);
 
-    // 4. 更新界面状态
     statusOutput.innerText = '正在转换中...⏳';
     statusOutput.style.color = 'black';
 
     try {
-        console.log('发送转换请求:', { filePath, targetFormat, selectedOutputPath });
-        
-        // 5. 【核心】呼叫后端，并传入 selectedOutputPath
         const result = await api.convertImage(filePath, targetFormat, selectedOutputPath);
-
-        console.log('后端返回:', result);
-
-        // 6. 处理结果
         if (result.success) {
-            statusOutput.innerText = `✅ 转换成功！保存在：${result.newPath}`;
+            statusOutput.innerText = `✅ 转换成功！\n保存路径：${result.newPath}`;
             statusOutput.style.color = 'green';
         } else {
             statusOutput.innerText = `❌ 失败：${result.error}`;
             statusOutput.style.color = 'red';
         }
     } catch (err) {
-        console.error('前端报错:', err);
         statusOutput.innerText = `❌ 程序错误：${err.message}`;
         statusOutput.style.color = 'red';
     }
 });
+
+// ==========================================
+// ✅ 逻辑 C：AI 画质增强 (新增)
+// ==========================================
+if (upscaleBtn) {
+    upscaleBtn.addEventListener('click', async () => {
+        // 1. 检查文件
+        if (fileInput.files.length === 0) {
+            alert('请先选择一张需要修复的图片！');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const filePath = api.getFilePath(file);
+
+        // 2. 友好的提示 (AI 比较慢)
+        statusOutput.innerHTML = '🚀 正在启动 AI 引擎进行 4倍超分...<br>这可能需要 10-30 秒，请耐心等待，不要关闭窗口。';
+        statusOutput.style.color = '#6f42c1'; // 紫色提示
+
+        // 禁用按钮防止重复点击
+        upscaleBtn.disabled = true;
+        upscaleBtn.innerText = 'AI 处理中...';
+
+        try {
+            console.log('开始 AI 增强:', filePath);
+            
+            // 3. 呼叫后端 api.upscaleImage (需要在 preload.js 定义过)
+            const result = await api.upscaleImage(filePath, selectedOutputPath);
+
+            if (result.success) {
+                statusOutput.innerHTML = `✅ <b>画质增强成功！</b><br>已保存为：${result.newPath}`;
+                statusOutput.style.color = 'green';
+            } else {
+                statusOutput.innerText = `❌ 增强失败：${result.error}`;
+                statusOutput.style.color = 'red';
+            }
+        } catch (err) {
+            console.error(err);
+            statusOutput.innerText = `❌ 调用错误：${err.message}\n请检查是否已下载 tools 并放入项目根目录。`;
+            statusOutput.style.color = 'red';
+        } finally {
+            // 恢复按钮状态
+            upscaleBtn.disabled = false;
+            upscaleBtn.innerText = '⚡ AI 画质增强 (变清晰 4倍)';
+        }
+    });
+}
