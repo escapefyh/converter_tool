@@ -249,3 +249,4 @@ async function slimFile(filePath, mode, outputDir) {
 module.exports = {
   slimFile,
 };
+
